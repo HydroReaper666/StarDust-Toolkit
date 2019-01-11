@@ -6,7 +6,7 @@ https://github.com/Kronos2308/StarDustCFWPack
 https://discord.gg/kscctYj
 
 
-# Features:
+**Features:**
 Update the StarDustCFWpack
 
 Toggle AutoRCM
