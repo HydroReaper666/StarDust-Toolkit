@@ -7,20 +7,22 @@ https://discord.gg/kscctYj
 
 
 **Features:**
-Update the StarDustCFWpack
 
-Toggle AutoRCM
+* Update the StarDustCFWpack
 
-Dump Cal0/Boot0/Boot1
+* Toggle AutoRCM
 
-Get prod.keys
+* Dump Cal0/Boot0/Boot1
 
-ArgonNX autoboot
+* Get prod.keys
 
-Reboot / shutdown
+* ArgonNX autoboot
+
+* Reboot / shutdown
 
 
-# Credits
+**Credits**
+
 devkitPro for the devkitA64 toolchain.
 
 Reisyukaku for the code base. - https://github.com/Reisyukaku/ReiNXToolkit
