@@ -794,7 +794,7 @@ void UI::renderMenu() {
 	}
 	
 	drawText(titleX, titleY, mThemes->txtcolor, title, mThemes->fntLarge); //titulo
-	drawText(1150, titleY, mThemes->txtcolor,"v"+version, mThemes->fntLarge);//vercion HB
+	drawText(1150, titleY, mThemes->txtcolor,"uo v"+version, mThemes->fntLarge);//vercion HB
 	
 	drawText(titleX, 655, mThemes->txtcolor,"Info:", mThemes->fntLarge); //info
 	
