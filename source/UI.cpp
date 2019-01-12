@@ -425,88 +425,10 @@ void UI::optAbout() {
         "D3fau4\n" +
         "REI\n" +
         "" ,    TYPE_OK);
-	//Easter egg ;^)
-		about++;
-    if (about == 10) {
-	    mainMenu.push_back(MenuOption("The truth", "Get the Truth now.",  bind(&UI::optTheTruth, this)));
-
-	}
+	
 }
-void UI::optTheTruth() {
-SDL_Surface* image1 = IMG_Load("romfs:/Graphics/Anim1.png");
-SDL_Texture* tex1 = SDL_CreateTextureFromSurface(mRender._renderer, image1);
-drawBackXY(image1, tex1, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex1);
 
-SDL_Surface* image2 = IMG_Load("romfs:/Graphics/Anim2.png");
-SDL_Texture* tex2 = SDL_CreateTextureFromSurface(mRender._renderer, image2);
-drawBackXY(image2, tex2, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex2);
 
-SDL_Surface* image3 = IMG_Load("romfs:/Graphics/Anim3.png");
-SDL_Texture* tex3 = SDL_CreateTextureFromSurface(mRender._renderer, image3);
-drawBackXY(image3, tex3, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex3);
-
-SDL_Surface* image4 = IMG_Load("romfs:/Graphics/Anim4.png");
-SDL_Texture* tex4 = SDL_CreateTextureFromSurface(mRender._renderer, image4);
-drawBackXY(image4, tex4, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex4);
-
-SDL_Surface* image5 = IMG_Load("romfs:/Graphics/Anim5.png");
-SDL_Texture* tex5 = SDL_CreateTextureFromSurface(mRender._renderer, image5);
-drawBackXY(image5, tex5, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex5);
-
-SDL_Surface* image6 = IMG_Load("romfs:/Graphics/Anim6.png");
-SDL_Texture* tex6 = SDL_CreateTextureFromSurface(mRender._renderer, image6);
-drawBackXY(image6, tex6, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex6);
-
-exitApp();
-}
 /*
 * SubMenus
 */
