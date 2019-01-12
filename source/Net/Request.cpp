@@ -23,7 +23,7 @@ static struct curl_slist *hosts = NULL;
 
 Net::Net() {
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    hosts = curl_slist_append(NULL, "switch.retrogamer.tech:80:139.99.172.148");
+    hosts = curl_slist_append(NULL, "github.com:140.82.118.4");
 }
 
 size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
