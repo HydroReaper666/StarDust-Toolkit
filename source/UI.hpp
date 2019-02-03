@@ -55,7 +55,10 @@ class UI
         void CreateProgressBar(ProgBar *prog, string header);
         void IncrementProgressBar(ProgBar *prog);
         void drawScaled(SDL_Surface *surf, SDL_Texture *tex, int x, int y, u32 w, u32 h);
-    private:
+        void exitApp();
+		void optGetPatch();
+		void InitialStage();
+		private:
         //MainMenu
         void optAutoRCM();
         void optStarDustUpdate();
@@ -70,8 +73,8 @@ class UI
         void optReboot();
         void optUpdateHB();
         void optautoboot();
-		void optTheTruth();
         void optremtemplate();
+		void optTheTruth();
 		
 		void optautobootatms();
 		void optautobootrei();
@@ -89,5 +92,4 @@ class UI
         
         void setTheme(Theme Theme);
         void deinit();
-        void exitApp();
 };

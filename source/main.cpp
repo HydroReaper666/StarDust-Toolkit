@@ -18,15 +18,30 @@
 
 #include <switch.h>
 #include "UI.hpp"
-
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+using namespace std;
+u32 clock_count = 0;
 
 int main() {    
 	UI ui(TITLE, VERSION);
 	UI::setInstance(ui);
+	ui.InitialStage();
     ui.renderMenu();
     
-    while(appletMainLoop()) {        
+    while(appletMainLoop()) {
+
+		
+		ui.InitialStage();
         hidScanInput();
+		//menu refresh speed
+		clock_count++;
+		if (clock_count == 100000) {
+		ui.renderMenu();
+		clock_count = 0;
+		}
+		
         u64 PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
         if((PressedInput & KEY_LSTICK_UP)||(PressedInput & KEY_DUP)) {
             ui.inSubMenu ? ui.SubMenuUp() : ui.MenuUp();
@@ -43,6 +58,11 @@ int main() {
         if(PressedInput & KEY_B) {
             ui.MenuBack();
             ui.renderMenu();
+        }
+        if(PressedInput & KEY_PLUS) ui.exitApp();
+		
+        if(PressedInput & KEY_L,PressedInput & KEY_R,PressedInput & KEY_X) {
+            ui.optGetPatch();
         }
     }
 }
