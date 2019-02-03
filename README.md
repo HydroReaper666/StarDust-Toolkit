@@ -2,7 +2,7 @@
 StarDust Toolkit for update and configure StarDustCFWpack
 https://github.com/Kronos2308/StarDustCFWPack
 
-![alt text](Stardust-Toolkit.jpg)
+![alt text](Stardust-Toolkit-1.13.jpg)
 https://discord.gg/kscctYj
 
 
