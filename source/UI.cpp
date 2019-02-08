@@ -164,10 +164,14 @@ void UI::optgetkeys() {
     ProgBar prog;
     prog.max = 1;
     prog.step = 1;
-    string url = "http://arte-tian-cuba.000webhostapp.com/teek";
+//must change "disable" for the url of the keys
+    string url = "disable";
     Net net = Net();
     hidScanInput();
-
+if (url = "disable"){
+MessageBox("Keys", "compilation error!\n\n no prod.keys for you \n\nSorry -.-", TYPE_OK);
+return;	
+}
     if (MessageBox("Keys", 
     "This will attempt to Get \nthe prod.keys.\n\n\nContinue?",
     TYPE_YES_NO)) {
