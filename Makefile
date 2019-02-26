@@ -1,14 +1,14 @@
 #---------------------------------------------------------------------------------
 .SUFFIXES:
 #---------------------------------------------------------------------------------
-
+#DEVKITARM = /c/linx-old/devkitPro/devkitARM
+#DEVKITPRO = /c/linx-old/devkitPro
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
 endif
 
 TOPDIR ?= $(CURDIR)
 include $(DEVKITPRO)/libnx/switch_rules
-
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
 # BUILD is the directory where object files & intermediate files will be placed
@@ -33,7 +33,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 APP_TITLE := StarDust Toolkit
 APP_AUTHOR := Kronos2308
-APP_VERSION := 1.10
+APP_VERSION := 1.16
 
 ICON := Icon.jpg
 TARGET		:=	StarDust

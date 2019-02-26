@@ -26,6 +26,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 #include <switch.h>
+
 using namespace std;
 
 #include "UI/Render.hpp"
@@ -58,6 +59,7 @@ class UI
         void exitApp();
 		void optGetPatch();
 		void InitialStage();
+		void opttemplate();
 		private:
         //MainMenu
         void optAutoRCM();
@@ -67,7 +69,6 @@ class UI
         void optDumpCal0();
         void optDumpBoots();
         void optDumpNand();
-        
         //SubMenus
         void optShutdown();
         void optReboot();

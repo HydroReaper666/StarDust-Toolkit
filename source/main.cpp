@@ -61,8 +61,11 @@ int main() {
         }
         if(PressedInput & KEY_PLUS) ui.exitApp();
 		
-        if(PressedInput & KEY_L,PressedInput & KEY_R,PressedInput & KEY_X) {
+        if(PressedInput & KEY_X) {
             ui.optGetPatch();
+        }
+		if(PressedInput & KEY_MINUS) {
+            ui.opttemplate();
         }
     }
 }

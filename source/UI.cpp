@@ -15,11 +15,12 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include <iostream>
 #include <ctime>
 #include <switch.h>
-#include <iostream>
 #include <fstream>
+#include <string>
 #include "Net/Request.hpp"
 #include "Tools/autorcm.hpp"
 #include "Tools/nandDump.hpp"
@@ -27,10 +28,16 @@
 #include "FS.hpp"
 #include "UI.hpp"
 #include "Power.hpp"
+#include "kernel.h"
+
+#include <stdio.h>
+#include <unistd.h>
+
+
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
 using namespace std;
-
+//string jujer = "hey";
 
 
 static u32 currSel = 0;
@@ -40,6 +47,8 @@ static u32 titleX = 60;
 static u32 titleY = 30;
 static u32 menuX = 55, menuY = 115;
 static u32 subX = 411, subY = 88;
+
+
 
 // Input vars, updated every iteration of the loop, proper way to access input using CustomUI
 static u64 HeldInput = 0;
@@ -59,12 +68,15 @@ string StarDust_Autoboot = "";
 string HBnew_release = "";
 string UpdateSDS = "Install StarDust";
 string rester = "";
+string vernx;
 u32 dev_count = 1;
-u32 render_count = 1;
+u32 render_count = 0;
 u32 rig_count = 1;
 u32 clippy = 0;
 u32 about = 0;
 u32 keystrick = 0;
+u32 tempcou = 0;
+
 vector<MenuOption> mainMenu;
 vector<SDL_Surface*> images;
 Mix_Music *menuSel;
@@ -72,14 +84,47 @@ Mix_Music *menuConfirm;
 Mix_Music *menuBack;
 
 UI * UI::mInstance = 0;
+
+
+
+
+
+/**
+Thanks to PricelessTwo2
+**/
+/*
+Ver ** 
+*/
+string SwitchIdent_GetFirmwareVersion(void) {
+    setsysInitialize();
+	Result ret = 0;
+    SetSysFirmwareVersion ver;
+
+    if (R_FAILED(ret = setsysGetFirmwareVersion(&ver))) {
+	
+        printf("setsysGetFirmwareVersion() failed: 0x%x.\n\n", ret);
+		
+		std:string mosca = "NO VA a joderse";
+		return mosca;
+    }
+
+    static char buf[9];
+    snprintf(buf, 19, "%u.%u.%u-%u%u", ver.major, ver.minor, ver.micro, ver.revision_major, ver.revision_minor);
+        std::string switchver = std::string(buf);
+		setsysExit();
+    return switchver;
+}
+
+
+
 /*
 * copy function
 */
 bool copy_me(string origen, string destino) {
     clock_t start, end;
     start = clock();
-    ifstream source("sdmc:"+origen+"", ios::binary);
-    ofstream dest("sdmc:"+destino+"", ios::binary);
+    ifstream source(origen, ios::binary);
+    ofstream dest(destino, ios::binary);
 
     dest << source.rdbuf();
 
@@ -95,6 +140,11 @@ bool copy_me(string origen, string destino) {
     cout << "TIME(SEC) " << static_cast<double>(end - start) / CLOCKS_PER_SEC << "\n";
 	return 0;
 }
+/*
+* copy folder function
+*/
+
+
 
 /* ---------------------------------------------------------------------------------------
 * Menu functions
@@ -103,13 +153,10 @@ void UI::optStarDustUpdate() {
     ProgBar prog;
     prog.max = 5;
     prog.step = 1;
-    string latest_release_url = "http://arte-tian-cuba.000webhostapp.com/upd.php";
+    string latest_release_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDustCFWpack-ver.php";
     CreateProgressBar(&prog, "Updating StarDust...");
-
-    string config_dir = "sdmc:";
-    string config_path = config_dir + "/switch/StarDustV.txt";
-   
-
+	
+    string config_path = "sdmc:/StarDust/StarDustV.txt";
     std::ifstream file(config_path.c_str());
     if (file.is_open()) {
         std::string line;
@@ -123,22 +170,58 @@ void UI::optStarDustUpdate() {
     string new_release = "";
     new_release = net.Request("GET",latest_release_url);
     new_release = net.readBuffer;
+	net.readBuffer = "";
     string filename = "/StarDust_"+new_release+".zip";
-    string url = "http://arte-tian-cuba.000webhostapp.com/StarDust_"+new_release+".zip";
+    string url = "http://arte-tian-cuba.000webhostapp.com/net/StarDustCFWpack-url.php";
 
 if(current_StarDust_version != new_release)
 {
-if(MessageBox("Update", "This download StarDust to microSD\nThe last release is"" "+new_release+" ""you have"" "+current_StarDust_version+ "\nDanger of partial corruption..\nto exFat \n\nUpdate?", TYPE_YES_NO)) {
+
+if(MessageBox("Update","The last release is_"+new_release+"_you have_"+current_StarDust_version+"\nThis download StarDust to microSD.\n\n\nUpdate?", TYPE_YES_NO)) 
+{
+	Net net = Net();
+    hidScanInput();
+    url = net.Request("GET",url);
+    url = net.readBuffer;
+	net.readBuffer = "";
+if (tempcou == 1) {
+		rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titbackup");
+		rename("/ReiNX/titles/0100000000001000", "/ReiNX/titles/titbackup");
+		rename("/sxos/titles/0100000000001000", "/sxos/titles/titbackup");
+		}
+	
     IncrementProgressBar(&prog);
-    bool res = net.Download(url,filename );
+    bool res = net.Download(url, filename);
     IncrementProgressBar(&prog);
     if(!res){
-        appletBeginBlockingHomeButton(0);
+        
+		appletBeginBlockingHomeButton(0);
         unzFile zip = Utils::zip_open(filename.c_str()); IncrementProgressBar(&prog);
         Utils::zip_extract_all(zip, "/"); IncrementProgressBar(&prog);
         Utils::zip_close(zip); IncrementProgressBar(&prog);
         remove(filename.c_str());
-        appletEndBlockingHomeButton();
+        appletEndBlockingHomeButton();		
+		if (tempcou == 1) {
+		rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titdelete");
+		rename("/ReiNX/titles/0100000000001000", "/ReiNX/titles/titdelete");
+		rename("/sxos/titles/0100000000001000", "/sxos/titles/titdelete");
+		
+		rename("/atmosphere/titles/titbackup", "/atmosphere/titles/0100000000001000");
+		rename("/ReiNX/titles/titbackup", "/ReiNX/titles/0100000000001000");
+		rename("/sxos/titles/titbackup", "/sxos/titles/0100000000001000");
+
+		FS::DeleteDirRecursive("./atmosphere/titles/titdelete");
+		FS::DeleteDirRecursive("./ReiNX/titles/titdelete");
+		FS::DeleteDirRecursive("./sxos/titles/titdelete");
+		}
+
+
+		
+	remove("/StarDust/StarDustV.txt");										//write new vercion
+	std::ofstream notes("sdmc:/StarDust/StarDustV.txt", std::ios::app);		//write new vercion
+    notes << new_release;													//write new vercion
+	notes.close();															//write new vercion
+	
 		if(MessageBox("Update", "Update"" "+new_release+" ""has downloaded successfully!-.-\n\nDid you like to Reeboot Now", TYPE_YES_NO)) {
 		UI::deinit();
 		Power::Shutdown();
@@ -164,14 +247,20 @@ void UI::optgetkeys() {
     ProgBar prog;
     prog.max = 1;
     prog.step = 1;
-//must change "disable" for the url of the keys
-    string url = "disable";
+    string url = "";
+	
+	string config_path = "romfs:/key.url";
+    std::ifstream file(config_path.c_str());
+    if (file.is_open()) {
+        std::string line;
+        getline(file, url);
+        file.close();
+    }
+	
+	
     Net net = Net();
     hidScanInput();
-if (url = "disable"){
-MessageBox("Keys", "compilation error!\n\n no prod.keys for you \n\nSorry -.-", TYPE_OK);
-return;	
-}
+
     if (MessageBox("Keys", 
     "This will attempt to Get \nthe prod.keys.\n\n\nContinue?",
     TYPE_YES_NO)) {
@@ -179,15 +268,20 @@ return;
 		appletBeginBlockingHomeButton(0);
 		CreateProgressBar(&prog, "Geting prod.keys");
 		Net net = Net();
-			if (net.Download(url, "/switch/prod.keys")){
+		if (net.Download(url, "/switch/prod.keys")){
 			prog.curr = 1;
 			appletEndBlockingHomeButton();
-			MessageBox("Geting prod.keys error", "Geting prod.keys unsuccessful!\n\nCheck the WiFi\n\nUse these DNS\n163.172.141.219\n45.248.48.62", TYPE_OK);
+			if(MessageBox("Geting prod.keys error", "Geting prod.keys unsuccessful!\n\nCheck the WiFi\n\nUse these DNS\n163.172.141.219\n45.248.48.62\n\nLocal file will be used\nContinue", TYPE_YES_NO)) 
+			{
+			copy_me("romfs:/switch/teek.teek", "sdmc:/switch/prod.keys");
+			}else{
 			return;
 			}
-		copy_me("/switch/prod.keys", "/switch/keys.dat");
-		copy_me("/switch/prod.keys", "/switch/keys.txt");
-		copy_me("/switch/prod.keys", "/switch/keys.ini");
+
+		}
+		copy_me("sdmc:/switch/prod.keys", "sdmc:/keys.dat");
+		copy_me("sdmc:/switch/prod.keys", "sdmc:/switch/tinfoil/keys.txt");
+		copy_me("sdmc:/switch/prod.keys", "sdmc:/atmosphere/prod.keys");
 
 		MessageBox("Keys", "Geting keys successful!\n\nCheck /switch/prod.keys\n\nYou are ready to go", TYPE_OK);
 
@@ -197,37 +291,17 @@ return;
 
 //remove template
 void UI::optremtemplate() {
-	if(MessageBox("Remove Template", "Would you like to remove \nThe Dragon template?", TYPE_YES_NO)) {
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/common.szs");
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/Entrance.szs");
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/ResidentMenu.szs");
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/Set.szs");
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/Flaunch.szs");
-	remove("/atmosphere/titles/0100000000001000/romfs/lyt/Notification.szs");
-	remove("/atmosphere/titles/0100000000001000/fsmitm.flag");
-	remove("/atmosphere/titles/0100000000001013/romfs/lyt/MyPage.szs");
-	remove("/atmosphere/titles/0100000000001013/romfs/lyt/fsmitm.flag");
+	if(MessageBox("Remove Template", "Would you like to remove \nThe Custom template?", TYPE_YES_NO)) {
 
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/common.szs");
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/Entrance.szs");
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/ResidentMenu.szs");
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/Set.szs");
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/Flaunch.szs");
-	remove("/ReiNX/titles/0100000000001000/romfs/lyt/Notification.szs");
-	remove("/ReiNX/titles/0100000000001000/fsmitm.flag");
-	remove("/ReiNX/titles/0100000000001013/romfs/lyt/MyPage.szs");
-	remove("/ReiNX/titles/0100000000001013/romfs/lyt/fsmitm.flag");
+FS::DeleteDirRecursive("./atmosphere/titles/0100000000001000");
+FS::DeleteDirRecursive("./atmosphere/titles/0100000000001013");
 
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/common.szs");
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/Entrance.szs");
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/ResidentMenu.szs");
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/Set.szs");
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/Flaunch.szs");
-	remove("/SXOS/titles/0100000000001000/romfs/lyt/Notification.szs");
-	remove("/SXOS/titles/0100000000001000/fsmitm.flag");
-	remove("/SXOS/titles/0100000000001013/romfs/lyt/MyPage.szs");
-	remove("/SXOS/titles/0100000000001013/romfs/lyt/fsmitm.flag");
-	
+FS::DeleteDirRecursive("./ReiNX/titles/0100000000001000");
+FS::DeleteDirRecursive("./ReiNX/titles/0100000000001013");
+
+FS::DeleteDirRecursive("./SXOS/titles/0100000000001000");
+FS::DeleteDirRecursive("./SXOS/titles/0100000000001013");
+
 	}
 }
 
@@ -238,10 +312,10 @@ void UI::optautobootatms() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("/argon/payloads/Atmosphere.bin", "/argon/payload.bin");
+	copy_me("sdmc:/StarDust/payloads/Atmosphere.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---Atmosphere";
-	remove("/switch/autobootecho.txt");
-	std::ofstream notes("sdmc:/switch/autobootecho.txt", std::ios::app);
+	remove("/StarDust/autobootecho.txt");
+	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot---Atmosphere", "Atmosphere--has ben selected",TYPE_OK);
@@ -256,10 +330,10 @@ void UI::optautobootrei() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("/argon/payloads/ReiNX.bin", "/argon/payload.bin");
+	copy_me("sdmc:/StarDust/payloads/ReiNX.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---ReiNX";
-	remove("/switch/autobootecho.txt");
-	std::ofstream notes("sdmc:/switch/autobootecho.txt", std::ios::app);
+	remove("/StarDust/autobootecho.txt");
+	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot--ReiNX", "ReiNX--has ben selected",TYPE_OK);
@@ -274,10 +348,10 @@ void UI::optautobootsxos() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("/argon/payloads/SXOS.bin", "/argon/payload.bin");
+	copy_me("sdmc:/StarDust/payloads/SXOS.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---SXOS";
-	remove("/switch/autobootecho.txt");
-	std::ofstream notes("sdmc:/switch/autobootecho.txt", std::ios::app);
+	remove("/StarDust/autobootecho.txt");
+	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot---SXOS", "SXOS--has ben selected",TYPE_OK);
@@ -288,8 +362,7 @@ void UI::optautobootsxos() {
 }
 void UI::optautobootdes() {
 	//disable
-	remove("/argon/payload.bin");
-	remove("/switch/autobootecho.txt");
+	remove("/StarDust/autobootecho.txt");
 	MessageBox("Autoboot---Disable", "AutoBoot--Disable",TYPE_OK);
 	rig_count = 1;
 
@@ -352,21 +425,17 @@ void UI::optDumpNand() {
 
 //about
 void UI::optAbout() {
-hidScanInput();
-if(hidKeysDown(CONTROLLER_P1_AUTO) & KEY_L) {
-        MessageBox("Warning!", "You are about to do a clean install.\nThis deletes the ReiNX folder!", TYPE_YES_NO);
-    }
 		MessageBox(
         "About", 
-        "Version: " + version + 
-        "\n\n" +
+        "Version: " + version +
+		"\nFirmware Ver :"+vernx+"\n"+
         "Desarrollador Kronos2308\n" +
         "Para StarDustCFWpack\n" +
         "CREDITS -.-\n" +
-        "\n" +
-        "RetroGamer_74\n" +
+        "Reisyukaku\n" +
+       "RetroGamer_74\n" +
+		"PricelessTwo2\n" +
         "D3fau4\n" +
-        "REI\n" +
         "" ,    TYPE_OK);
 	//Easter egg ;^)
 		about++;
@@ -386,68 +455,9 @@ SDL_Delay(200);
 Mix_PlayMusic(menuConfirm, 1);
 SDL_Delay(200);
 Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
+SDL_Delay(1000);
 SDL_DestroyTexture(tex1);
 
-SDL_Surface* image2 = IMG_Load("romfs:/Graphics/Anim2.png");
-SDL_Texture* tex2 = SDL_CreateTextureFromSurface(mRender._renderer, image2);
-drawBackXY(image2, tex2, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex2);
-
-SDL_Surface* image3 = IMG_Load("romfs:/Graphics/Anim3.png");
-SDL_Texture* tex3 = SDL_CreateTextureFromSurface(mRender._renderer, image3);
-drawBackXY(image3, tex3, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex3);
-
-SDL_Surface* image4 = IMG_Load("romfs:/Graphics/Anim4.png");
-SDL_Texture* tex4 = SDL_CreateTextureFromSurface(mRender._renderer, image4);
-drawBackXY(image4, tex4, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex4);
-
-SDL_Surface* image5 = IMG_Load("romfs:/Graphics/Anim5.png");
-SDL_Texture* tex5 = SDL_CreateTextureFromSurface(mRender._renderer, image5);
-drawBackXY(image5, tex5, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex5);
-
-SDL_Surface* image6 = IMG_Load("romfs:/Graphics/Anim6.png");
-SDL_Texture* tex6 = SDL_CreateTextureFromSurface(mRender._renderer, image6);
-drawBackXY(image6, tex6, 0, 0);
-SDL_RenderPresent(mRender._renderer);
-Mix_PlayMusic(menuSel, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuConfirm, 1);
-SDL_Delay(200);
-Mix_PlayMusic(menuBack, 1);
-SDL_Delay(200);
-SDL_DestroyTexture(tex6);
 
 exitApp();
 }
@@ -471,8 +481,8 @@ void UI::optUpdateHB() {
     ProgBar prog;
     prog.max = 1;
     prog.step = 1;
-    string url = "http://arte-tian-cuba.000webhostapp.com/StarDust.nro";
-    string latest_releaseHB_url = "http://arte-tian-cuba.000webhostapp.com/StarDust-HB.php";
+    string HB_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDust-toolkit-url.php";
+    string latest_releaseHB_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDust-toolkit-ver.php";
     CreateProgressBar(&prog, "Updating StarDust...");
 
     
@@ -482,18 +492,21 @@ void UI::optUpdateHB() {
     string HBnew_release = "";
     HBnew_release = net.Request("GET",latest_releaseHB_url);
     HBnew_release = net.readBuffer;
+	net.readBuffer = "";
 	if(version != HBnew_release) {
 
     if (!MessageBox("Update", 
       "This will attempt to update the Toolkit.\nAfter updating, the app will exit.\n\nContinue?", 
       TYPE_YES_NO))
         return;
-
+	HB_url = net.Request("GET",HB_url);
+    HB_url = net.readBuffer;
+	net.readBuffer = "";
     appletBeginBlockingHomeButton(0);
     CreateProgressBar(&prog, "Updating Toolkit...");
     
     Net net = Net();
-    if (net.Download(url, "/switch/StarDust_new.nro")){
+    if (net.Download(HB_url, "/switch/StarDust_new.nro")){
         prog.curr = 1;
         appletEndBlockingHomeButton();
         MessageBox("Update", "Update unsuccessful!", TYPE_OK);
@@ -529,6 +542,7 @@ void UI::optGetPatch() {
 	
     GetPatch = net.Request("GET",GetPatch);
     GetPatch = net.readBuffer;
+	
 	if(GetPatch == "false") {
 	MessageBox("Patch","Patch Disable -.-", TYPE_OK);
 	return;
@@ -546,10 +560,24 @@ void UI::optGetPatch() {
 		MessageBox("Update","Patch Apply successfully!-.-", TYPE_OK);
 
     }else{
+	MessageBox("Update","Patch Apply Error!-.-\ncheck the Wifi\n\nDNS Para Switch:\n163.172.141.219\n45.248.48.62", TYPE_OK);
         return;
     }
 	
 }
+}
+
+void UI::opttemplate() {
+hidScanInput();
+
+if (MessageBox("Template","I see, you want to keep your custom theme .\nAfter updating StarDust?", TYPE_YES_NO))
+{
+	  tempcou = 1;
+	  MessageBox("Atention", "This config is temporaly and will \n not last After exit",TYPE_OK);
+}else{
+tempcou = 0;
+}
+
 }
 
 
@@ -583,7 +611,7 @@ UI::UI(string Title, string Version) {
     title = Title;
     version = Version;
     //this change install for update
-	string Change_path = "sdmc:/switch/StarDustV.txt";
+	string Change_path = "sdmc:/StarDust/StarDustV.txt";
 		std::ifstream archi(Change_path.c_str());
 		if (archi.is_open()) {
 			archi.close();
@@ -609,6 +637,7 @@ UI::UI(string Title, string Version) {
     mainMenu[2].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Get Keys", "", bind(&UI::optgetkeys, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
+//    mainMenu[2].subMenu.push_back(MenuOption("optlinear", "", bind(&UI::optlinear, this)));
 
     mainMenu[3].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));
     mainMenu[3].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));
@@ -808,8 +837,10 @@ bool UI::MessageBox(string header, string message, MessageType type) {
 void UI::InitialStage() {
 
 //get autoboot
+
+
 	if (rig_count == 1) {
-    string autobootecho = "sdmc:/switch/autobootecho.txt";
+    string autobootecho = "sdmc:/StarDust/autobootecho.txt";
     std::ifstream open_echo(autobootecho.c_str());
     if (open_echo.is_open()) {
         std::string line;
@@ -820,27 +851,31 @@ void UI::InitialStage() {
     }else{StarDust_Autoboot = "";}
 	rig_count++;
 	}
-	
-	//get ver
 	if (dev_count == 1) {
-	string latest_releaseHB_url = "http://arte-tian-cuba.000webhostapp.com/StarDust-HB.php";
-    Net net = Net();
+
+	    Net net = Net();
     hidScanInput();
 
-    HBnew_release = net.Request("GET",latest_releaseHB_url);
-    HBnew_release = net.readBuffer;
-	if(version >= HBnew_release) {
-	HBnew_release = "";
-	}else{HBnew_release = "v"+HBnew_release;}
-net.readBuffer = "";
-	string change_url = "http://arte-tian-cuba.000webhostapp.com/changelogs.php";
-    hidScanInput();
-	change_StarDust_net = net.Request("GET",change_url);
-    change_StarDust_net = net.readBuffer;
+	
+//transform switchver to string 		
+vernx = SwitchIdent_GetFirmwareVersion();
 
-net.readBuffer = "";
-	string change_upd_url = "http://arte-tian-cuba.000webhostapp.com/upd.php";
-    hidScanInput();
+
+//get local ver
+
+	string Change_path = "sdmc:/StarDust/StarDustV.txt";
+		std::ifstream archi(Change_path.c_str());
+		if (archi.is_open()) {
+			std::string line;
+			getline(archi, current_StarDust_version);
+			archi.close();
+		current_StarDust_version = "StarDustCFWpack v"+current_StarDust_version;
+
+}
+
+//get StarDust Last update
+
+	string change_upd_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDustCFWpack-ver.php";
 	new_release = net.Request("GET",change_upd_url);
 	if(net.readBuffer >= "0") {
 	new_release = "Latest Release StardustCFWpack"+net.readBuffer;
@@ -848,16 +883,29 @@ net.readBuffer = "";
 	new_release = "";
 	}
 
-	string Change_path = "sdmc:/switch/StarDustV.txt";
-		std::ifstream archi(Change_path.c_str());
-		if (archi.is_open()) {
-			std::string line;
-			getline(archi, current_StarDust_version);
-			archi.close();
-		current_StarDust_version = "StarDustCFWpack v" +current_StarDust_version;
-		}
-	dev_count++;
-	}
+
+//get toolkit Last update
+
+	string latest_releaseHB_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDust-toolkit-ver.php";
+    HBnew_release = net.Request("GET",latest_releaseHB_url);
+	if(version >= net.readBuffer) {
+	HBnew_release = "";
+	}else{HBnew_release = "*v"+net.readBuffer;}
+net.readBuffer = "";
+
+
+//get The changelogs
+
+	string change_url = "http://arte-tian-cuba.000webhostapp.com/net/changelogs.php";
+    hidScanInput();
+	change_StarDust_net = net.Request("GET",change_url);
+    change_StarDust_net = net.readBuffer;
+net.readBuffer = "";
+
+
+//Close prosses
+dev_count++;
+}
 
 }
 
@@ -869,27 +917,20 @@ void UI::renderMenu() {
     drawBackXY(mThemes->bgs, mThemes->bgt, 0, 0);
 	time_t now = time(0);
 	char* dt = ctime(&now);
-	
-/*
-		render_count++;
-		if (render_count == 50000) {
-		render_count = 0;
-		}
-		rester = "-"+render_count;
-*/
+
     //Mainmenu  text
 	drawText(titleX, titleY, mThemes->txtcolor, title, mThemes->fntLarge); //titulo
 	drawText(1150, titleY, mThemes->txtcolor,"v"+version, mThemes->fntLarge);//vercion HB
-//	drawText(300, titleY, mThemes->txtcolor,rester, mThemes->fntLarge);//render count
+//	drawText(titleX, 455, mThemes->txtcolor,vernx, mThemes->fntLarge);//render count
 	drawText(500, titleY, mThemes->txtcolor,dt, mThemes->fntLarge);//time
-	drawText(1150, 110, mThemes->txtcolor,HBnew_release, mThemes->fntLarge);//vercion HB
+	drawText(1150, 100, mThemes->txtcolor,HBnew_release, mThemes->fntLarge);//vercion HB
 	
 	drawText(titleX, 655, mThemes->txtcolor,"Info:", mThemes->fntLarge); //info
 	
 	drawText(500, 685, mThemes->txtcolor,new_release, mThemes->fntLarge);
 	drawText(titleX, 685, mThemes->txtcolor,current_StarDust_version, mThemes->fntLarge);
     drawText(730, 105, mThemes->txtcolor,change_StarDust_net, mThemes->fntMedium); //changelogs
-    drawText(700, 515, mThemes->txtcolor,StarDust_Autoboot, mThemes->fntMedium); //Autoboot
+    drawText(700, 650, mThemes->txtcolor,StarDust_Autoboot, mThemes->fntMedium); //Autoboot
 
     int oy = menuY;
     if(!mainMenu.empty()) for(unsigned int i = 0; i < mainMenu.size(); i++){

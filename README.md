@@ -1,8 +1,10 @@
 # StarDust-Toolkit
+[![License (GPL version 3)](https://img.shields.io/badge/license-GNU%20GPL%20version%203-red.svg?style=flat-square)](http://opensource.org/licenses/GPL-3.0)
+
 StarDust Toolkit for update and configure StarDustCFWpack
 https://github.com/Kronos2308/StarDustCFWPack
 
-![alt text](Stardust-Toolkit-v1.13.jpg)
+![alt text](splash.jpg)
 https://discord.gg/kscctYj
 
 
