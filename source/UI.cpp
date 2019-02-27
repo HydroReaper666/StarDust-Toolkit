@@ -480,7 +480,7 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 			CreateProgressBar(&prog, "Unlock...");
 			copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
 			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-			optReboot();
+			UI::optReboot();
 			
 		}else{
 		return;
@@ -494,7 +494,7 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 		file.close();
 		remove("/atmosphere/kips/ams_mitm.kip");
 		MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-		optReboot();
+		UI::optReboot();
 		
 
 	}
