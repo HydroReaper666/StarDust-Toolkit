@@ -273,7 +273,7 @@ void UI::optgetkeys() {
 			appletEndBlockingHomeButton();
 			if(MessageBox("Geting prod.keys error", "Geting prod.keys unsuccessful!\n\nCheck the WiFi\n\nUse these DNS\n163.172.141.219\n45.248.48.62\n\nLocal file will be used\nContinue", TYPE_YES_NO)) 
 			{
-			copy_me("romfs:/switch/teek.teek", "sdmc:/switch/prod.keys");
+			copy_me("romfs:/teek.teek", "sdmc:/switch/prod.keys");
 			}else{
 			return;
 			}
