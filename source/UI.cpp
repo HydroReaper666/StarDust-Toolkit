@@ -480,14 +480,13 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 			CreateProgressBar(&prog, "Unlock...");
 			copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
 			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-			UI::deinit();
-			Power::Reboot();
+			optReboot();
 			
 		}else{
 		return;
 		}
 	}else{
-		if (!MessageBox("Atention","This will return to normal the prodinfo protection.\nAnd reboot the switch\n\nContinue?",TYPE_YES_NO)) 
+		if (!MessageBox("Atention","This will return to normal the prodinfo \nprotection and reboot the switch\n\nContinue?",TYPE_YES_NO)) 
 		{
 		return;
 		}
@@ -495,8 +494,8 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 		file.close();
 		remove("/atmosphere/kips/ams_mitm.kip");
 		MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-		UI::deinit();
-		Power::Reboot();
+		optReboot();
+		
 
 	}
 return;
