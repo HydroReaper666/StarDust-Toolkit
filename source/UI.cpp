@@ -477,8 +477,8 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 		return;
 		}
 		if (MessageBox("Advertencia", "Esto desbloqueará el Prodinfo.\nY reiniciara la switch\nEspero sepas lo que haces\nno olvides desactivarlo al terminar\nContinue?",TYPE_YES_NO)) {
-			CreateProgressBar(&prog, "Geting prod.keys");
-				copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
+			CreateProgressBar(&prog, "Unlock...");
+			copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
 			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
 			UI::deinit();
 			Power::Reboot();
@@ -487,7 +487,12 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 		return;
 		}
 	}else{
-		if (!MessageBox("Atention","This will return to normal the prodinfo protection.\nAnd reboot the switch\n\nContinue?",TYPE_YES_NO)) {return;}
+		if (!MessageBox("Atention","This will return to normal the prodinfo protection.\nAnd reboot the switch\n\nContinue?",TYPE_YES_NO)) 
+		{
+		return;
+		}
+		CreateProgressBar(&prog, "ReLock...");
+		file.close();
 		remove("/atmosphere/kips/ams_mitm.kip");
 		MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
 		UI::deinit();
