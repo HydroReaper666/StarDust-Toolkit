@@ -650,6 +650,11 @@ UI::UI(string Title, string Version) {
 			archi.close();
 		UpdateSDS = "Update StarDust";
 		}
+	//this check if prodinfo is unlock or lock
+	string calunlock = "";
+	ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
+    if(!file){calunlock = "Unlock Prodinfo";}else{calunlock = "Relock Prodinfo";}
+
     menuSel = Mix_LoadMUS("romfs:/Sounds/menu_select.mp3");
     menuConfirm = Mix_LoadMUS("romfs:/Sounds/menu_confirm.mp3");
     menuBack = Mix_LoadMUS("romfs:/Sounds/menu_back.mp3");
@@ -667,7 +672,7 @@ UI::UI(string Title, string Version) {
     mainMenu[0].subMenu.push_back(MenuOption("Update Toolkit", "", bind(&UI::optUpdateHB, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Get Keys ", "", bind(&UI::optgetkeys, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Unlock Prodinfo", "", bind(&UI::optlinear, this)));
+    mainMenu[2].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
 
