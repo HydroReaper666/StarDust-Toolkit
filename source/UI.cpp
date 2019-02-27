@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <unistd.h>
 
-
 #define WIN_WIDTH 1280
 #define WIN_HEIGHT 720
 using namespace std;
@@ -362,6 +361,7 @@ void UI::optautobootsxos() {
 }
 void UI::optautobootdes() {
 	//disable
+	remove("/StarDust/payload.bin");
 	remove("/StarDust/autobootecho.txt");
 	MessageBox("Autoboot---Disable", "AutoBoot--Disable",TYPE_OK);
 	rig_count = 1;
@@ -464,11 +464,44 @@ exitApp();
 /*
 * SubMenus
 */
+//proddinfo
+void UI::optlinear() {
+ ProgBar prog;
+    prog.max = 1;
+    prog.step = 1;
+
+ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
+    if(!file){
+
+		if (!MessageBox("Warning","This will unlock the Prodinfo.\nAnd reboot the switch\ni hope you now what you are doing\ndo not forget to disable it when you finished\nContinue?",TYPE_YES_NO)) {
+		return;
+		}
+		if (MessageBox("Advertencia", "Esto desbloqueará el Prodinfo.\nY reiniciara la switch\nEspero sepas lo que haces\nno olvides desactivarlo al terminar\nContinue?",TYPE_YES_NO)) {
+			CreateProgressBar(&prog, "Geting prod.keys");
+				copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
+			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
+			UI::deinit();
+			Power::Reboot();
+			
+		}else{
+		return;
+		}
+	}else{
+		if (!MessageBox("Atention","This will return to normal the prodinfo protection.\nAnd reboot the switch\n\nContinue?",TYPE_YES_NO)) {return;}
+		remove("/atmosphere/kips/ams_mitm.kip");
+		MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
+		UI::deinit();
+		Power::Reboot();
+
+	}
+return;
+}
+
 
 //Power
 void UI::optReboot() {
     UI::deinit();
-    Power::Reboot();
+	Power::Reboot();
 }
 void UI::optShutdown() {
     UI::deinit();
@@ -632,12 +665,11 @@ UI::UI(string Title, string Version) {
     //Subpages
     mainMenu[0].subMenu.push_back(MenuOption(UpdateSDS, "", bind(&UI::optStarDustUpdate, this)));
     mainMenu[0].subMenu.push_back(MenuOption("Update Toolkit", "", bind(&UI::optUpdateHB, this)));
- /*   mainMenu[0].subMenu.push_back(MenuOption("Changelogs", "", bind(&UI::optchangelogs, this)));*/
-    mainMenu[2].subMenu.push_back(MenuOption("Backup Cal0", "", bind(&UI::optDumpCal0, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Get Keys", "", bind(&UI::optgetkeys, this)));
     mainMenu[2].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
-//    mainMenu[2].subMenu.push_back(MenuOption("optlinear", "", bind(&UI::optlinear, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Get Keys ", "", bind(&UI::optgetkeys, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Unlock Prodinfo", "", bind(&UI::optlinear, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
 
     mainMenu[3].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));
     mainMenu[3].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));
