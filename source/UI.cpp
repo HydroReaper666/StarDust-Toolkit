@@ -657,7 +657,9 @@ UI::UI(string Title, string Version) {
 	//this check if prodinfo is unlock or lock
 	string calunlock = "";
 	ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
-    if(!file){calunlock = "Unlock Prodinfo";}else{calunlock = "Relock Prodinfo";}
+    if(!file){calunlock = "Unlock Prodinfo";}else{
+	calunlock = "Relock Prodinfo";
+	file.close();}
 
     menuSel = Mix_LoadMUS("romfs:/Sounds/menu_select.mp3");
     menuConfirm = Mix_LoadMUS("romfs:/Sounds/menu_confirm.mp3");
