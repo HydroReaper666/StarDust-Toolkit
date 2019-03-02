@@ -667,7 +667,6 @@ UI::UI(string Title, string Version) {
    
     //Main pages
     mainMenu.push_back(MenuOption("StarDust Updates", "Update StarDust .", nullptr));
-	mainMenu.push_back(MenuOption("Toggle AutoRCM", "Toggle AutoRCM by Writin in Nand.",  bind(&UI::optAutoRCM, this)));
     mainMenu.push_back(MenuOption("StarDustTools", "StarDust Tools.", nullptr));
     mainMenu.push_back(MenuOption("ArgonNX AutoBoot", "Autoboot", nullptr));
     mainMenu.push_back(MenuOption("Power", "Power options.", nullptr));
@@ -676,19 +675,21 @@ UI::UI(string Title, string Version) {
     //Subpages
     mainMenu[0].subMenu.push_back(MenuOption(UpdateSDS, "", bind(&UI::optStarDustUpdate, this)));
     mainMenu[0].subMenu.push_back(MenuOption("Update Toolkit", "", bind(&UI::optUpdateHB, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Get Keys ", "", bind(&UI::optgetkeys, this)));
-    mainMenu[2].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
+	
+    mainMenu[1].subMenu.push_back(MenuOption("Get Keys ", "", bind(&UI::optgetkeys, this)));
+    mainMenu[1].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
+    mainMenu[1].subMenu.push_back(MenuOption("Toggle AutoRCM", "", bind(&UI::optAutoRCM, this)));
+    mainMenu[1].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
+    mainMenu[1].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
+    mainMenu[1].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
 
-    mainMenu[3].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));
-    mainMenu[3].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));
-    mainMenu[3].subMenu.push_back(MenuOption("SXOS", "", bind(&UI::optautobootsxos, this)));
-    mainMenu[3].subMenu.push_back(MenuOption("Disable AutoBoot", "", bind(&UI::optautobootdes, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("SXOS", "", bind(&UI::optautobootsxos, this)));
+    mainMenu[2].subMenu.push_back(MenuOption("Disable AutoBoot", "", bind(&UI::optautobootdes, this)));
     
-    mainMenu[4].subMenu.push_back(MenuOption("Reboot", "", bind(&UI::optReboot, this)));
-    mainMenu[4].subMenu.push_back(MenuOption("Shutdown", "", bind(&UI::optShutdown, this)));
+    mainMenu[3].subMenu.push_back(MenuOption("Reboot", "", bind(&UI::optReboot, this)));
+    mainMenu[3].subMenu.push_back(MenuOption("Shutdown", "", bind(&UI::optShutdown, this)));
 
 
 
@@ -996,7 +997,7 @@ void UI::renderMenu() {
                 }else{
                     drawText(subX + 30, subY + 30 + ((j+1)*50), mThemes->txtcolor, mainMenu[i].subMenu[j].getName(), mThemes->fntMedium);
                 }
-                if(j == currSubSel && currSel == 1) {
+                if(j == currSubSel && currSel == 8) {
                     SDL_Texture* tex = SDL_CreateTextureFromSurface(mRender._renderer, images[currSubSel]);
                     drawScaled(images[currSubSel], tex, 710, 120, images[currSubSel]->w/3, images[currSubSel]->h/3);
                 }
