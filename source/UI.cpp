@@ -436,7 +436,7 @@ void UI::optAbout() {
         "Para StarDustCFWpack\n" +
         "CREDITS -.-\n" +
         "Reisyukaku\n" +
-       "RetroGamer_74\n" +
+		"RetroGamer_74\n" +
 		"PricelessTwo2\n" +
         "D3fau4\n" +
         "" ,    TYPE_OK);
@@ -702,7 +702,7 @@ UI::UI(string Title, string Version) {
 	ifstream checker("sdmc:/StarDust/StarDustV.txt");
     if(checker){
 	checker.close();
-	mainMenu[1].subMenu.push_back(MenuOption("Del Custon hbmenu", "", bind(&UI::optHBmenu, this)));
+	mainMenu[1].subMenu.push_back(MenuOption("Del Custom Menu", "", bind(&UI::optHBmenu, this)));
 	}
 	
     mainMenu[1].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
@@ -962,7 +962,7 @@ ifstream existen("sdmc:/StarDust/StarDustV.txt");
 	}else{
 	new_release = "";
 	}
-
+net.readBuffer = "";
 
 //get toolkit Last update
 
@@ -970,7 +970,9 @@ ifstream existen("sdmc:/StarDust/StarDustV.txt");
     HBnew_release = net.Request("GET",latest_releaseHB_url);
 	if(version >= net.readBuffer) {
 	HBnew_release = "";
-	}else{HBnew_release = "*v"+net.readBuffer;}
+	}else{
+	HBnew_release = "*v"+net.readBuffer;
+	}
 net.readBuffer = "";
 
 
@@ -1003,7 +1005,7 @@ void UI::renderMenu() {
 	drawText(1150, titleY, mThemes->txtcolor,"v"+version, mThemes->fntLarge);//vercion HB
 //	drawText(titleX, 455, mThemes->txtcolor,rester, mThemes->fntLarge);//render count
 	drawText(500, titleY, mThemes->txtcolor,dt, mThemes->fntLarge);//time
-	drawText(1150, 100, mThemes->txtcolor,HBnew_release, mThemes->fntLarge);//vercion HB
+	drawText(1150, 100, mThemes->selcolor,HBnew_release, mThemes->fntLarge);//vercion HB
 	
 	drawText(titleX, 655, mThemes->txtcolor,"Info:", mThemes->fntLarge); //info
 	
