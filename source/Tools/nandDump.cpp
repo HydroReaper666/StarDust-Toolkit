@@ -26,9 +26,9 @@ UI *ui;
 ProgBar prog;
 int buffer_size;
 
-const char * directoryname = "Toolkit/dump";
-const char * absdirname = "sdmc:/Toolkit/dump";
-const char * progfile = "sdmc:/Toolkit/dump/progress";
+const char * directoryname = "StarDust/dump";
+const char * absdirname = "sdmc:/StarDust/dump";
+const char * progfile = "sdmc:/StarDust/dump/progress";
 
 u64 Tools::CheckFreeSpace() {
     struct statvfs st;
@@ -120,7 +120,7 @@ int Tools::DumpPartition(int part_number, string name) {
             break;
     }
     //makes sure paths exist before attempting to write to them
-    mkpath("sdmc:/Toolkit", S_IRWXU);//Both mkpath()s have to be present to make the Toolkit/dump folder to prevent a bug where nandDump does not start properly
+    mkpath("sdmc:/StarDust", S_IRWXU);//Both mkpath()s have to be present to make the StarDust/dump folder to prevent a bug where nandDump does not start properly
     mkpath(absdirname,S_IRWXU);
     //timing code
     Result rc = timeInitialize();
