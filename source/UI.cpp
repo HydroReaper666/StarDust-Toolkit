@@ -110,6 +110,7 @@ string SwitchIdent_GetFirmwareVersion(void) {
 	rester = std::string(major);
 	
     static char buf[9];
+	snprintf(buf, 19, "%u.%u.%u-%u%u", ver.major, ver.minor, ver.micro, ver.revision_major, ver.revision_minor);
         std::string switchver = std::string(buf);
 		setsysExit();
     return switchver;
