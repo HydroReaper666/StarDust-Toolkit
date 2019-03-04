@@ -933,7 +933,7 @@ vernx = SwitchIdent_GetFirmwareVersion();
 //del set.szs on 5.x.x or lower
 ifstream existen("sdmc:/StarDust/StarDustV.txt");
 	if(existen){
-	file.close();
+	existen.close();
 		if(rester <= "5"){
 		remove("/atmosphere/titles/0100000000001000/romfs/lyt/Set.szs");
 		remove("/ReiNX/titles/0100000000001000/romfs/lyt/Set.szs");
