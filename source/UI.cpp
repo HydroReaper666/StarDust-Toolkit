@@ -28,7 +28,6 @@
 #include "FS.hpp"
 #include "UI.hpp"
 #include "Power.hpp"
-#include "kernel.h"
 
 #include <stdio.h>
 #include <unistd.h>
