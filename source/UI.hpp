@@ -77,6 +77,7 @@ class UI
         void optremtemplate();
 		void optTheTruth();
 		void optlinear();
+		void optHBmenu();
 		
 		void optautobootatms();
 		void optautobootrei();

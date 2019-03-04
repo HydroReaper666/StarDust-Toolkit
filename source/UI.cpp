@@ -105,9 +105,11 @@ string SwitchIdent_GetFirmwareVersion(void) {
 		std:string mosca = "NO VA a joderse";
 		return mosca;
     }
-
+	static char major[9];
+    snprintf(major, 19, "%u", ver.major);
+	rester = std::string(major);
+	
     static char buf[9];
-    snprintf(buf, 19, "%u.%u.%u-%u%u", ver.major, ver.minor, ver.micro, ver.revision_major, ver.revision_minor);
         std::string switchver = std::string(buf);
 		setsysExit();
     return switchver;
@@ -147,6 +149,7 @@ bool copy_me(string origen, string destino) {
 /* ---------------------------------------------------------------------------------------
 * Menu functions
 */
+//Update StarDustCFWpack
 void UI::optStarDustUpdate() {
     ProgBar prog;
     prog.max = 5;
@@ -500,6 +503,23 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 return;
 }
 
+//homebrew menu
+void UI::optHBmenu() {
+	ProgBar prog;
+    prog.max = 1;
+    prog.step = 1;
+	if (!MessageBox("Info","This will remove the custom hbmenu\n\nContinue?",TYPE_YES_NO)) {
+	return;
+	}
+	CreateProgressBar(&prog, "hbmenu...");
+	rename("/hbmenu.nro", "/Custom_hbmenu.nro");
+	remove("/hbmenu.nro");
+	copy_me("/switch/hbmenu/hbmenu.nro", "sdmc:/hbmenu.nro");
+	FS::DeleteDirRecursive("./switch/hbmenu");
+	
+	MessageBox("Info", "Proces complete", TYPE_OK);
+
+}
 
 //Power
 void UI::optReboot() {
@@ -606,13 +626,12 @@ void UI::optGetPatch() {
 void UI::opttemplate() {
 hidScanInput();
 
-if (MessageBox("Template","I see, you want to keep your custom theme .\nAfter updating StarDust?", TYPE_YES_NO))
-{
-	  tempcou = 1;
-	  MessageBox("Atention", "This config is temporaly and will \n not last After exit",TYPE_OK);
-}else{
-tempcou = 0;
-}
+	if (MessageBox("Template","I see, you want to keep your custom theme .\nAfter updating StarDust?", TYPE_YES_NO)){
+	tempcou = 1;
+	MessageBox("Atention", "This config is temporaly and will \n not last After exit",TYPE_OK);
+	}else{
+	tempcou = 0;
+	}
 
 }
 
@@ -679,6 +698,12 @@ UI::UI(string Title, string Version) {
     mainMenu[1].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Toggle AutoRCM", "", bind(&UI::optAutoRCM, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
+	ifstream checker("sdmc:/StarDust/StarDustV.txt");
+    if(checker){
+	checker.close();
+	mainMenu[1].subMenu.push_back(MenuOption("Del Custon hbmenu", "", bind(&UI::optHBmenu, this)));
+	}
+	
     mainMenu[1].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
 
@@ -894,6 +919,7 @@ void UI::InitialStage() {
     }else{StarDust_Autoboot = "";}
 	rig_count++;
 	}
+	
 	if (dev_count == 1) {
 
 	    Net net = Net();
@@ -904,8 +930,19 @@ void UI::InitialStage() {
 vernx = SwitchIdent_GetFirmwareVersion();
 
 
-//get local ver
+//del set.szs on 5.x.x or lower
+ifstream existen("sdmc:/StarDust/StarDustV.txt");
+	if(existen){
+	file.close();
+		if(rester <= "5"){
+		remove("/atmosphere/titles/0100000000001000/romfs/lyt/Set.szs");
+		remove("/ReiNX/titles/0100000000001000/romfs/lyt/Set.szs");
+		remove("/sxos/titles/0100000000001000/romfs/lyt/Set.szs");
+		}
+	}
 
+
+//get local ver
 	string Change_path = "sdmc:/StarDust/StarDustV.txt";
 		std::ifstream archi(Change_path.c_str());
 		if (archi.is_open()) {
@@ -917,7 +954,6 @@ vernx = SwitchIdent_GetFirmwareVersion();
 }
 
 //get StarDust Last update
-
 	string change_upd_url = "http://arte-tian-cuba.000webhostapp.com/net/StarDustCFWpack-ver.php";
 	new_release = net.Request("GET",change_upd_url);
 	if(net.readBuffer >= "0") {
@@ -964,7 +1000,7 @@ void UI::renderMenu() {
     //Mainmenu  text
 	drawText(titleX, titleY, mThemes->txtcolor, title, mThemes->fntLarge); //titulo
 	drawText(1150, titleY, mThemes->txtcolor,"v"+version, mThemes->fntLarge);//vercion HB
-//	drawText(titleX, 455, mThemes->txtcolor,vernx, mThemes->fntLarge);//render count
+//	drawText(titleX, 455, mThemes->txtcolor,rester, mThemes->fntLarge);//render count
 	drawText(500, titleY, mThemes->txtcolor,dt, mThemes->fntLarge);//time
 	drawText(1150, 100, mThemes->txtcolor,HBnew_release, mThemes->fntLarge);//vercion HB
 	
