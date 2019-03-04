@@ -719,7 +719,7 @@ UI::UI(string Title, string Version) {
 
     
     //Make dirs
-//    if(!FS::DirExists("/StarDust"))  FS::MakeDir("/StarDust", 0777);
+    if(!FS::DirExists("/StarDust"))  FS::MakeDir("/StarDust", 0777);
 }
 
 void UI::setInstance(UI ui) {
