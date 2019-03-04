@@ -186,23 +186,25 @@ if(MessageBox("Update","The last release is_"+new_release+"_you have_"+current_S
     url = net.Request("GET",url);
     url = net.readBuffer;
 	net.readBuffer = "";
-if (tempcou == 1) {
-		rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titbackup");
-		rename("/ReiNX/titles/0100000000001000", "/ReiNX/titles/titbackup");
-		rename("/sxos/titles/0100000000001000", "/sxos/titles/titbackup");
-		}
 	
     IncrementProgressBar(&prog);
     bool res = net.Download(url, filename);
     IncrementProgressBar(&prog);
+	appletBeginBlockingHomeButton(0);
     if(!res){
+		if (tempcou == 1) {
+			rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titbackup");
+			rename("/ReiNX/titles/0100000000001000", "/ReiNX/titles/titbackup");
+			rename("/sxos/titles/0100000000001000", "/sxos/titles/titbackup");
+			}
+	
+	
         
-		appletBeginBlockingHomeButton(0);
         unzFile zip = Utils::zip_open(filename.c_str()); IncrementProgressBar(&prog);
         Utils::zip_extract_all(zip, "/"); IncrementProgressBar(&prog);
         Utils::zip_close(zip); IncrementProgressBar(&prog);
         remove(filename.c_str());
-        appletEndBlockingHomeButton();		
+		
 		if (tempcou == 1) {
 		rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titdelete");
 		rename("/ReiNX/titles/0100000000001000", "/ReiNX/titles/titdelete");
@@ -223,7 +225,7 @@ if (tempcou == 1) {
 	std::ofstream notes("sdmc:/StarDust/StarDustV.txt", std::ios::app);		//write new vercion
     notes << new_release;													//write new vercion
 	notes.close();															//write new vercion
-	
+		appletEndBlockingHomeButton();
 		if(MessageBox("Update", "Update"" "+new_release+" ""has downloaded successfully!-.-\n\nDid you like to Reeboot Now", TYPE_YES_NO)) {
 		UI::deinit();
 		Power::Shutdown();
@@ -231,12 +233,14 @@ if (tempcou == 1) {
 
     }else{
         prog.curr = 4;
+		appletEndBlockingHomeButton();
         MessageBox("UpdateError", "Ahahahahahah Update Error!", TYPE_OK);
     }
  }
 }
 else
 {
+	appletEndBlockingHomeButton();
     MessageBox(
         "You're up to date",
         "The last release is"" "+new_release+" ""you have"" "+current_StarDust_version+"",
@@ -272,11 +276,11 @@ void UI::optgetkeys() {
 		Net net = Net();
 		if (net.Download(url, "/switch/prod.keys")){
 			prog.curr = 1;
-			appletEndBlockingHomeButton();
 			if(MessageBox("Geting prod.keys error", "Geting prod.keys unsuccessful!\n\nCheck the WiFi\n\nUse these DNS\n163.172.141.219\n45.248.48.62\n\nLocal file will be used\nContinue", TYPE_YES_NO)) 
 			{
 			copy_me("romfs:/teek.teek", "sdmc:/switch/prod.keys");
 			}else{
+			appletEndBlockingHomeButton();
 			return;
 			}
 
@@ -284,7 +288,7 @@ void UI::optgetkeys() {
 		copy_me("sdmc:/switch/prod.keys", "sdmc:/keys.dat");
 		copy_me("sdmc:/switch/prod.keys", "sdmc:/switch/tinfoil/keys.txt");
 		copy_me("sdmc:/switch/prod.keys", "sdmc:/atmosphere/prod.keys");
-
+		appletEndBlockingHomeButton();
 		MessageBox("Keys", "Geting keys successful!\n\nCheck /switch/prod.keys\n\nYou are ready to go", TYPE_OK);
 
 	  return;
@@ -1003,7 +1007,6 @@ void UI::renderMenu() {
     //Mainmenu  text
 	drawText(titleX, titleY, mThemes->txtcolor, title, mThemes->fntLarge); //titulo
 	drawText(1150, titleY, mThemes->txtcolor,"v"+version, mThemes->fntLarge);//vercion HB
-//	drawText(titleX, 455, mThemes->txtcolor,rester, mThemes->fntLarge);//render count
 	drawText(500, titleY, mThemes->txtcolor,dt, mThemes->fntLarge);//time
 	drawText(1150, 100, mThemes->selcolor,HBnew_release, mThemes->fntLarge);//vercion HB
 	
@@ -1012,7 +1015,8 @@ void UI::renderMenu() {
 	drawText(500, 685, mThemes->txtcolor,new_release, mThemes->fntLarge);
 	drawText(titleX, 685, mThemes->txtcolor,current_StarDust_version, mThemes->fntLarge);
     drawText(730, 105, mThemes->txtcolor,change_StarDust_net, mThemes->fntMedium); //changelogs
-    drawText(700, 650, mThemes->txtcolor,StarDust_Autoboot, mThemes->fntMedium); //Autoboot
+    drawText(700, 650, mThemes->selcolor,StarDust_Autoboot, mThemes->fntMedium); //Autoboot
+//	drawText(titleX, 455, mThemes->txtcolor,rester, mThemes->fntLarge);//render count
 
     int oy = menuY;
     if(!mainMenu.empty()) for(unsigned int i = 0; i < mainMenu.size(); i++){
