@@ -16,7 +16,6 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "Services/bpc.h"
 #include "Power.hpp"
 
 void Power::Reboot() {
