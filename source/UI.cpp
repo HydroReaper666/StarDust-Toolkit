@@ -27,7 +27,6 @@
 #include "Utils/unzip_utils.hpp"
 #include "FS.hpp"
 #include "UI.hpp"
-#include "Power.hpp"
 
 #include <stdio.h>
 #include <unistd.h>
@@ -57,6 +56,7 @@ static u64 ReleasedInput = 0;
 static string title;
 static string version;
 static string current_StarDust_version= "----";
+static string current_StarDust_version1= "----";
 string origen;
 string destino;
 string new_release = "";
@@ -82,11 +82,6 @@ Mix_Music *menuConfirm;
 Mix_Music *menuBack;
 
 UI * UI::mInstance = 0;
-
-
-
-
-
 /**
 Thanks to PricelessTwo2
 **/
@@ -118,34 +113,6 @@ string SwitchIdent_GetFirmwareVersion(void) {
 
 
 
-/*
-* copy function
-*/
-bool copy_me(string origen, string destino) {
-    clock_t start, end;
-    start = clock();
-    ifstream source(origen, ios::binary);
-    ofstream dest(destino, ios::binary);
-
-    dest << source.rdbuf();
-
-    source.close();
-    dest.close();
-
-    end = clock();
-
-    cout << "CLOCKS_PER_SEC " << CLOCKS_PER_SEC << "\n";
-    cout << "CPU-TIME START " << start << "\n";
-    cout << "CPU-TIME END " << end << "\n";
-    cout << "CPU-TIME END - START " <<  end - start << "\n";
-    cout << "TIME(SEC) " << static_cast<double>(end - start) / CLOCKS_PER_SEC << "\n";
-	return 0;
-}
-/*
-* copy folder function
-*/
-
-
 
 /* ---------------------------------------------------------------------------------------
 * Menu functions
@@ -162,7 +129,7 @@ void UI::optStarDustUpdate() {
     std::ifstream file(config_path.c_str());
     if (file.is_open()) {
         std::string line;
-        getline(file, current_StarDust_version);
+        getline(file, current_StarDust_version1);
         file.close();
     }
     
@@ -186,11 +153,11 @@ if(MessageBox("Update","The last release is_"+new_release+"_you have_"+current_S
     url = net.Request("GET",url);
     url = net.readBuffer;
 	net.readBuffer = "";
-	
+	appletBeginBlockingHomeButton(0);	
     IncrementProgressBar(&prog);
     bool res = net.Download(url, filename);
     IncrementProgressBar(&prog);
-	appletBeginBlockingHomeButton(0);
+
     if(!res){
 		if (tempcou == 1) {
 			rename("/atmosphere/titles/0100000000001000", "/atmosphere/titles/titbackup");
@@ -228,7 +195,7 @@ if(MessageBox("Update","The last release is_"+new_release+"_you have_"+current_S
 		appletEndBlockingHomeButton();
 		if(MessageBox("Update", "Update"" "+new_release+" ""has downloaded successfully!-.-\n\nDid you like to Reeboot Now", TYPE_YES_NO)) {
 		UI::deinit();
-		Power::Shutdown();
+		UI::optReboot();
 		}
 
     }else{
@@ -278,16 +245,16 @@ void UI::optgetkeys() {
 			prog.curr = 1;
 			if(MessageBox("Geting prod.keys error", "Geting prod.keys unsuccessful!\n\nCheck the WiFi\n\nUse these DNS\n163.172.141.219\n45.248.48.62\n\nLocal file will be used\nContinue", TYPE_YES_NO)) 
 			{
-			copy_me("romfs:/teek.teek", "sdmc:/switch/prod.keys");
+			FS::copy_me("romfs:/teek.teek", "sdmc:/switch/prod.keys");
 			}else{
 			appletEndBlockingHomeButton();
 			return;
 			}
 
 		}
-		copy_me("sdmc:/switch/prod.keys", "sdmc:/keys.dat");
-		copy_me("sdmc:/switch/prod.keys", "sdmc:/switch/tinfoil/keys.txt");
-		copy_me("sdmc:/switch/prod.keys", "sdmc:/atmosphere/prod.keys");
+		FS::copy_me("sdmc:/switch/prod.keys", "sdmc:/keys.dat");
+		FS::copy_me("sdmc:/switch/prod.keys", "sdmc:/switch/tinfoil/keys.txt");
+		FS::copy_me("sdmc:/switch/prod.keys", "sdmc:/atmosphere/prod.keys");
 		appletEndBlockingHomeButton();
 		MessageBox("Keys", "Geting keys successful!\n\nCheck /switch/prod.keys\n\nYou are ready to go", TYPE_OK);
 
@@ -318,7 +285,7 @@ void UI::optautobootatms() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("sdmc:/StarDust/payloads/Atmosphere.bin", "sdmc:/StarDust/payload.bin");
+	FS::copy_me("sdmc:/StarDust/payloads/Atmosphere.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---Atmosphere";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
@@ -336,7 +303,7 @@ void UI::optautobootrei() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("sdmc:/StarDust/payloads/ReiNX.bin", "sdmc:/StarDust/payload.bin");
+	FS::copy_me("sdmc:/StarDust/payloads/ReiNX.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---ReiNX";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
@@ -354,7 +321,7 @@ void UI::optautobootsxos() {
     prog.max = 1;
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
-	copy_me("sdmc:/StarDust/payloads/SXOS.bin", "sdmc:/StarDust/payload.bin");
+	FS::copy_me("sdmc:/StarDust/payloads/SXOS.bin", "sdmc:/StarDust/payload.bin");
 	string secconder = "---SXOS";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
@@ -485,7 +452,7 @@ ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
 		}
 		if (MessageBox("Advertencia", "Esto desbloqueará el Prodinfo.\nY reiniciara la switch\nEspero sepas lo que haces\nno olvides desactivarlo al terminar\nContinue?",TYPE_YES_NO)) {
 			CreateProgressBar(&prog, "Unlock...");
-			copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
+			FS::copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
 			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
 			UI::optReboot();
 			
@@ -519,7 +486,7 @@ void UI::optHBmenu() {
 	CreateProgressBar(&prog, "hbmenu...");
 	rename("/hbmenu.nro", "/Custom_hbmenu.nro");
 	remove("/hbmenu.nro");
-	copy_me("/switch/hbmenu/hbmenu.nro", "sdmc:/hbmenu.nro");
+	FS::copy_me("/switch/hbmenu/hbmenu.nro", "sdmc:/hbmenu.nro");
 	FS::DeleteDirRecursive("./switch/hbmenu");
 	
 	MessageBox("Info", "Proces complete", TYPE_OK);
@@ -529,11 +496,15 @@ void UI::optHBmenu() {
 //Power
 void UI::optReboot() {
     UI::deinit();
-	Power::Reboot();
+	bpcInitialize();
+    bpcRebootSystem();
+    bpcExit();
 }
 void UI::optShutdown() {
     UI::deinit();
-    Power::Shutdown();
+	bpcInitialize();
+    bpcShutdownSystem();
+    bpcExit();
 }
 
 
@@ -952,9 +923,9 @@ ifstream existen("sdmc:/StarDust/StarDustV.txt");
 		std::ifstream archi(Change_path.c_str());
 		if (archi.is_open()) {
 			std::string line;
-			getline(archi, current_StarDust_version);
+			getline(archi, current_StarDust_version1);
 			archi.close();
-		current_StarDust_version = "StarDustCFWpack v"+current_StarDust_version;
+		current_StarDust_version1 = "StarDustCFWpack v"+current_StarDust_version1;
 
 }
 
@@ -1013,7 +984,7 @@ void UI::renderMenu() {
 	drawText(titleX, 655, mThemes->txtcolor,"Info:", mThemes->fntLarge); //info
 	
 	drawText(500, 685, mThemes->txtcolor,new_release, mThemes->fntLarge);
-	drawText(titleX, 685, mThemes->txtcolor,current_StarDust_version, mThemes->fntLarge);
+	drawText(titleX, 685, mThemes->txtcolor,current_StarDust_version1, mThemes->fntLarge);
     drawText(730, 105, mThemes->txtcolor,change_StarDust_net, mThemes->fntMedium); //changelogs
     drawText(700, 650, mThemes->selcolor,StarDust_Autoboot, mThemes->fntMedium); //Autoboot
 //	drawText(titleX, 455, mThemes->txtcolor,rester, mThemes->fntLarge);//render count

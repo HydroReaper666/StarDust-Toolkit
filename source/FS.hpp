@@ -21,11 +21,12 @@
 #include <string>
 #include <cstring>
 #include <vector>
-
+#include <fstream>
 using namespace std;
 
 namespace FS {
     vector<string> EnumDir(string);
+	bool copy_me(string origen, string destino);
     bool DirExists(string dirstr);
     unsigned DeleteDirRecursive(string path);
     unsigned MakeDir(string file, unsigned perm);

@@ -15,11 +15,13 @@
 * You should have received a copy of the GNU General Public License
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <fstream>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <switch.h>
 #include "FS.hpp"
+
 
 vector<string> FS::EnumDir(string path) {
     DIR *dp;
@@ -32,6 +34,29 @@ vector<string> FS::EnumDir(string path) {
         closedir(dp);
     }
     return ret;
+}
+/*
+* copy function
+*/
+bool FS::copy_me(string origen, string destino) {
+    clock_t start, end;
+    start = clock();
+    ifstream source(origen, ios::binary);
+    ofstream dest(destino, ios::binary);
+
+    dest << source.rdbuf();
+
+    source.close();
+    dest.close();
+
+    end = clock();
+
+    cout << "CLOCKS_PER_SEC " << CLOCKS_PER_SEC << "\n";
+    cout << "CPU-TIME START " << start << "\n";
+    cout << "CPU-TIME END " << end << "\n";
+    cout << "CPU-TIME END - START " <<  end - start << "\n";
+    cout << "TIME(SEC) " << static_cast<double>(end - start) / CLOCKS_PER_SEC << "\n";
+	return 0;
 }
 
 bool FS::DirExists(string dirstr) {

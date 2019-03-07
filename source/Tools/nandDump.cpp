@@ -17,7 +17,6 @@
 */
 
 #include "nandDump.hpp"
-#include "../Power.hpp"
 extern "C" {
 #include "../Utils/utils.h"
 }
@@ -196,7 +195,9 @@ int Tools::DumpPartition(int part_number, string name) {
             timeExit();
             ui->MessageBox("Warning!", "Out of free space. Copy the dumped files\n to a safe spot, then rerun to finish dumping.", TYPE_OK);
             fsdevUnmountAll();
-            Power::Shutdown();
+			bpcInitialize();
+			bpcShutdownSystem();
+			bpcExit();
             return 1;
         }
 
