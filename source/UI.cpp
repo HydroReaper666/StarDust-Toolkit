@@ -598,7 +598,7 @@ void UI::optGetPatch() {
     GetPatch = net.readBuffer;
 	
 	if(GetPatch == "false") {
-	MessageBox("Patch","Patch Disable -.-", TYPE_OK);
+	MessageBox("Patch","No Patch Avaiable -.-", TYPE_OK);
 	return;
 	}else{
 	CreateProgressBar(&prog, "get Patch ...");
@@ -719,9 +719,6 @@ mainMenu.clear();
     mainMenu[3].subMenu.push_back(MenuOption("Reboot", "", bind(&UI::optReboot, this)));
     mainMenu[3].subMenu.push_back(MenuOption("Shutdown", "", bind(&UI::optShutdown, this)));
 
-
-
-    
     //Make dirs
     if(!FS::DirExists("/StarDust"))  FS::MakeDir("/StarDust", 0777);
 }
