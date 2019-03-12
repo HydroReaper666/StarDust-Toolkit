@@ -26,6 +26,8 @@ using namespace std;
 
 namespace FS {
     vector<string> EnumDir(string);
+	bool check_ex(string check);
+	bool Flag_me(string flags);
 	bool copy_me(string origen, string destino);
     bool DirExists(string dirstr);
     unsigned DeleteDirRecursive(string path);

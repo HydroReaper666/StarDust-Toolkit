@@ -286,14 +286,13 @@ void UI::optautobootatms() {
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
 	FS::copy_me("sdmc:/StarDust/payloads/Atmosphere.bin", "sdmc:/StarDust/payload.bin");
-	string secconder = "---Atmosphere";
+	string secconder = "Atmosphere";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot---Atmosphere", "Atmosphere--has ben selected",TYPE_OK);
-	rig_count = 1;
-
+	Paintmenu();
 	return;
 
 }
@@ -304,14 +303,13 @@ void UI::optautobootrei() {
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
 	FS::copy_me("sdmc:/StarDust/payloads/ReiNX.bin", "sdmc:/StarDust/payload.bin");
-	string secconder = "---ReiNX";
+	string secconder = "ReiNX";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot--ReiNX", "ReiNX--has ben selected",TYPE_OK);
-	rig_count = 1;
-
+	Paintmenu();
 	return;
 
 }
@@ -322,14 +320,13 @@ void UI::optautobootsxos() {
     prog.step = 1;
 	CreateProgressBar(&prog, "Enabling..");
 	FS::copy_me("sdmc:/StarDust/payloads/SXOS.bin", "sdmc:/StarDust/payload.bin");
-	string secconder = "---SXOS";
+	string secconder = "SXOS";
 	remove("/StarDust/autobootecho.txt");
 	std::ofstream notes("sdmc:/StarDust/autobootecho.txt", std::ios::app);
     notes << secconder;
 	notes.close();
 	MessageBox("Autoboot---SXOS", "SXOS--has ben selected",TYPE_OK);
-	rig_count = 1;
-
+	Paintmenu();
 	return;
 
 }
@@ -338,8 +335,7 @@ void UI::optautobootdes() {
 	remove("/StarDust/payload.bin");
 	remove("/StarDust/autobootecho.txt");
 	MessageBox("Autoboot---Disable", "AutoBoot--Disable",TYPE_OK);
-	rig_count = 1;
-
+	Paintmenu();
 	return;
 	
 }
@@ -347,9 +343,13 @@ void UI::optautobootdes() {
 void UI::optAutoRCM() {
     bool res = MessageBox("Warning!", "THIS WRITES TO NAND.\nDo you want to continue?", TYPE_YES_NO);
     if(res) {
+		FS::Flag_me("sdmc:/atmosphere/flags/hbl_bis_write.flag");
+		FS::Flag_me("sdmc:/atmosphere/titles/0104444444441001/flags/bis_write.flag");
         appletBeginBlockingHomeButton(0);
         int ret = Tools::toggle_rcm();
         appletEndBlockingHomeButton();
+		remove("/atmosphere/flags/hbl_bis_write.flag");
+		remove("/atmosphere/titles/0104444444441001/flags/bis_write.flag");
         MessageBox("AutoRCM", ret ? "AutoRCM enabled" : "AutoRCM disabled", TYPE_OK);
     }
     
@@ -367,6 +367,8 @@ void UI::optAutoRCM() {
 }
 
 void UI::optDumpCal0() {
+		FS::Flag_me("sdmc:/atmosphere/flags/hbl_cal_read.flag");
+		FS::Flag_me("sdmc:/atmosphere/titles/0104444444441001/flags/cal_read.flag");
     if(Tools::CheckFreeSpace() >= CAL0_BLOCK_SIZE) {
         appletBeginBlockingHomeButton(0);
         Tools::DumpPartition(ProdInfo, "cal0.bin");
@@ -374,6 +376,8 @@ void UI::optDumpCal0() {
     } else {
         MessageBox("Warning!", "Not enough space on the SD card to write to!", TYPE_OK);
     }
+	remove("/atmosphere/flags/hbl_cal_read.flag");
+	remove("/atmosphere/titles/0104444444441001/flags/cal_read.flag");
 }
 
 void UI::optDumpBoots() {
@@ -435,6 +439,8 @@ SDL_DestroyTexture(tex1);
 
 exitApp();
 }
+
+
 /*
 * SubMenus
 */
@@ -444,31 +450,47 @@ void UI::optlinear() {
     prog.max = 1;
     prog.step = 1;
 
-ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
-    if(!file){
 
-		if (!MessageBox("Warning","This will unlock the Prodinfo.\nAnd reboot the switch\ni hope you now what you are doing\ndo not forget to disable it when you finished\nContinue?",TYPE_YES_NO)) {
+//	 if(!FS::check_ex("sdmc:/atmosphere/flags/hbl_cal_write.flag")){
+//			FS::Flag_me("sdmc:/atmosphere/flags/juju.flag");
+//			
+
+    if(!FS::check_ex("sdmc:/atmosphere/flags/hbl_cal_write.flag")){
+
+		if (!MessageBox("Warning","This will unlock the Prodinfo.\ni hope you now what you are doing\ndo not forget to disable it when you finished\nContinue?",TYPE_YES_NO)) {
 		return;
 		}
-		if (MessageBox("Advertencia", "Esto desbloqueará el Prodinfo.\nY reiniciara la switch\nEspero sepas lo que haces\nno olvides desactivarlo al terminar\nContinue?",TYPE_YES_NO)) {
+		if (MessageBox("Advertencia", "Esto desbloqueará el Prodinfo.\nEspero sepas lo que haces\nno olvides desactivarlo al terminar\nContinue?",TYPE_YES_NO)) {
 			CreateProgressBar(&prog, "Unlock...");
-			FS::copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
-			MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-			UI::optReboot();
-			
+			FS::Flag_me("sdmc:/atmosphere/flags/hbl_cal_write.flag");
+				//	check Stardust
+				if(!FS::check_ex("sdmc:/StarDust/StarDustV.txt")){
+					if(!FS::check_ex("sdmc:/atmosphere/kips/ams_mitm.kip")){
+						FS::copy_me("romfs:/ams_mitm.kip", "sdmc:/atmosphere/kips/ams_mitm.kip");
+						if (MessageBox("-_-","UPS it seems that \nyou are not using StarDustCFWpack.\nI have applied a patch to enable the flags,\nbut you need to restart the switch,\n\n would you like to do it now?\nREBOOT?",TYPE_YES_NO)) {
+							UI::optReboot();
+						}else{
+							return;
+						}
+					}
+				}
+			MessageBox("Result", "All green\n\npress A", TYPE_OK);
+			UI::Paintmenu();
+			return;
 		}else{
 		return;
 		}
 	}else{
-		if (!MessageBox("Atention","This will return to normal the prodinfo \nprotection and reboot the switch\n\nContinue?",TYPE_YES_NO)) 
+		if (!MessageBox("Atention","This will return to normal the prodinfo \nprotection of the switch\n\nContinue?",TYPE_YES_NO))
 		{
 		return;
 		}
 		CreateProgressBar(&prog, "ReLock...");
-		file.close();
-		remove("/atmosphere/kips/ams_mitm.kip");
-		MessageBox("Result", "All green\n\npress A to reboot", TYPE_OK);
-		UI::optReboot();
+		remove("/atmosphere/flags/hbl_cal_write.flag");
+		if(FS::check_ex("sdmc:/StarDust/StarDustV.txt")){remove("/atmosphere/kips/ams_mitm.kip");}
+		MessageBox("Result", "All green\n\npress A", TYPE_OK);
+		UI::Paintmenu();
+		return;
 		
 
 	}
@@ -641,23 +663,28 @@ UI::UI(string Title, string Version) {
 
     title = Title;
     version = Version;
-    //this change install for update
-	string Change_path = "sdmc:/StarDust/StarDustV.txt";
-		std::ifstream archi(Change_path.c_str());
-		if (archi.is_open()) {
-			archi.close();
-		UpdateSDS = "Update StarDust";
-		}
-	//this check if prodinfo is unlock or lock
-	string calunlock = "";
-	ifstream file("sdmc:/atmosphere/kips/ams_mitm.kip");
-    if(!file){calunlock = "Unlock Prodinfo";}else{
-	calunlock = "Relock Prodinfo";
-	file.close();}
-
-    menuSel = Mix_LoadMUS("romfs:/Sounds/menu_select.mp3");
+	menuSel = Mix_LoadMUS("romfs:/Sounds/menu_select.mp3");
     menuConfirm = Mix_LoadMUS("romfs:/Sounds/menu_confirm.mp3");
     menuBack = Mix_LoadMUS("romfs:/Sounds/menu_back.mp3");
+	UI::Paintmenu();
+}
+void UI::Paintmenu() {
+mainMenu.clear();
+    //this change install for update and visevers
+	if(FS::check_ex("sdmc:/StarDust/StarDustV.txt")){UpdateSDS = "Update StarDust";}
+
+	//this check if prodinfo is unlock or lock
+	string calunlock = "";
+	if(!FS::check_ex("sdmc:/atmosphere/flags/hbl_cal_write.flag")){calunlock = "Unlock Prodinfo";}else{calunlock = "Relock Prodinfo";}
+//get autoboot
+    string autobootecho = "sdmc:/StarDust/autobootecho.txt";
+    std::ifstream open_echo(autobootecho.c_str());
+    if (open_echo.is_open()) {
+        std::string line;
+        getline(open_echo, StarDust_Autoboot);
+        open_echo.close();
+		StarDust_Autoboot = "Autoboot:---"+StarDust_Autoboot;
+		}else{StarDust_Autoboot = "";}
    
     //Main pages
     mainMenu.push_back(MenuOption("StarDust Updates", "Update StarDust .", nullptr));
@@ -674,20 +701,21 @@ UI::UI(string Title, string Version) {
     mainMenu[1].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Toggle AutoRCM", "", bind(&UI::optAutoRCM, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
-	ifstream checker("sdmc:/StarDust/StarDustV.txt");
-    if(checker){
-	checker.close();
+
+   	if(FS::check_ex("sdmc:/StarDust/StarDustV.txt")){
 	mainMenu[1].subMenu.push_back(MenuOption("Del Custom Menu", "", bind(&UI::optHBmenu, this)));
 	}
 	
     mainMenu[1].subMenu.push_back(MenuOption("Backup Prodinfo", "", bind(&UI::optDumpCal0, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Backup Boot0/1", "", bind(&UI::optDumpBoots, this)));
 
-    mainMenu[2].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));
-    mainMenu[2].subMenu.push_back(MenuOption("SXOS", "", bind(&UI::optautobootsxos, this)));
+	if(StarDust_Autoboot != "Autoboot:---Atmosphere"){mainMenu[2].subMenu.push_back(MenuOption("Atmosphere", "", bind(&UI::optautobootatms, this)));}
+	if(StarDust_Autoboot != "Autoboot:---ReiNX"){mainMenu[2].subMenu.push_back(MenuOption("ReiNX", "", bind(&UI::optautobootrei, this)));}
+	if(StarDust_Autoboot != "Autoboot:---SXOS"){mainMenu[2].subMenu.push_back(MenuOption("SXOS", "", bind(&UI::optautobootsxos, this)));}
+	
+	if(FS::check_ex("sdmc:/StarDust/autobootecho.txt")){
     mainMenu[2].subMenu.push_back(MenuOption("Disable AutoBoot", "", bind(&UI::optautobootdes, this)));
-    
+    }
     mainMenu[3].subMenu.push_back(MenuOption("Reboot", "", bind(&UI::optReboot, this)));
     mainMenu[3].subMenu.push_back(MenuOption("Shutdown", "", bind(&UI::optShutdown, this)));
 
@@ -879,22 +907,6 @@ bool UI::MessageBox(string header, string message, MessageType type) {
 //Initial stage 
 */
 void UI::InitialStage() {
-
-//get autoboot
-
-
-	if (rig_count == 1) {
-    string autobootecho = "sdmc:/StarDust/autobootecho.txt";
-    std::ifstream open_echo(autobootecho.c_str());
-    if (open_echo.is_open()) {
-        std::string line;
-        getline(open_echo, StarDust_Autoboot);
-        open_echo.close();
-		StarDust_Autoboot = "Autoboot:"+StarDust_Autoboot;
-
-    }else{StarDust_Autoboot = "";}
-	rig_count++;
-	}
 	
 	if (dev_count == 1) {
 
@@ -952,7 +964,6 @@ net.readBuffer = "";
 
 
 //get The changelogs
-
 	string change_url = "http://arte-tian-cuba.000webhostapp.com/net/changelogs.php";
     hidScanInput();
 	change_StarDust_net = net.Request("GET",change_url);

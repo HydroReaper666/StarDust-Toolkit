@@ -16,12 +16,13 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <fstream>
+#include <iostream>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <switch.h>
 #include "FS.hpp"
-
+using namespace std;
 
 vector<string> FS::EnumDir(string path) {
     DIR *dp;
@@ -35,6 +36,25 @@ vector<string> FS::EnumDir(string path) {
     }
     return ret;
 }
+bool FS::check_ex(string check) {
+ifstream file(check);
+    if(file){
+	file.close();
+	return true;
+	}else{
+	file.close();
+	return false;
+	}
+}
+/*
+* create flag function
+*/
+bool FS::Flag_me(string flags) {
+    ofstream dest(flags, ios::binary);
+    dest.close();
+	return 0;
+}
+
 /*
 * copy function
 */
