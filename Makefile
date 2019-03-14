@@ -33,7 +33,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 APP_TITLE := StarDust Toolkit
 APP_AUTHOR := Kronos2308
-APP_VERSION := 1.17
+APP_VERSION := 1.18
 
 ICON := Icon.jpg
 TARGET		:=	StarDust

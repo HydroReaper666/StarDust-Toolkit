@@ -27,6 +27,8 @@ using namespace std;
 namespace FS {
     vector<string> EnumDir(string);
 	bool check_ex(string check);
+	string getnettext(string nettext);
+	string read_fl(string config_path);
 	bool Flag_me(string flags);
 	bool copy_me(string origen, string destino);
     bool DirExists(string dirstr);

@@ -22,6 +22,8 @@
 #include <unistd.h>
 #include <switch.h>
 #include "FS.hpp"
+#include "Net/Request.hpp"
+
 using namespace std;
 
 vector<string> FS::EnumDir(string path) {
@@ -36,6 +38,28 @@ vector<string> FS::EnumDir(string path) {
     }
     return ret;
 }
+
+string FS::read_fl(string config_path) {
+string devuelve = "";
+    std::ifstream file(config_path.c_str());
+    if (file.is_open()) {
+        std::string line;
+        getline(file, devuelve);
+        file.close();
+    }
+	return devuelve;
+}
+
+string FS::getnettext(string nettext){
+    Net net = Net();
+    hidScanInput();
+	net.readBuffer = "";
+    string HBnew_release = "";
+    HBnew_release = net.Request("GET",nettext);
+	return net.readBuffer;
+}
+
+//check file exist
 bool FS::check_ex(string check) {
 ifstream file(check);
     if(file){
