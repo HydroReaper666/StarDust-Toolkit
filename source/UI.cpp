@@ -245,6 +245,34 @@ void UI::optgetkeys() {
 	}
 }
 
+
+//linked switch
+void UI::optgetaccount() {
+    ProgBar prog;
+    prog.max = 1;
+    prog.step = 1;
+    if (MessageBox("Account", 
+    "This will attempt to Get \nthe linked account.\nPlease make a backup \nof all your saves \n\nContinue?",
+    TYPE_YES_NO)) {
+
+        FS::copy_me("system:/save/8000000000000010", "sdmc:/StarDust/backup/nand/8000000000000010");
+		FS::copy_me("system:/save/8000000000000011", "sdmc:/StarDust/backup/nand/8000000000000011");
+        FS::copy_me("system:/save/8000000000000012", "sdmc:/StarDust/backup/nand/8000000000000012");
+        FS::copy_me("system:/save/8000000000000013", "sdmc:/StarDust/backup/nand/8000000000000013");
+		//romfs to nand
+        FS::Flag_me("sdmc:/atmosphere/flags/hbl_cal_write.flag");
+		FS::copy_me("romfs:/nand/8000000000000010", "system:/save/8000000000000010");
+		FS::copy_me("romfs:/nand/8000000000000011", "system:/save/8000000000000011");
+        FS::copy_me("romfs:/nand/8000000000000012", "system:/save/8000000000000012");
+        FS::copy_me("romfs:/nand/8000000000000013", "system:/save/8000000000000013");
+        remove("/atmosphere/flags/hbl_cal_write.flag");
+		appletEndBlockingHomeButton();
+		MessageBox("Account", "Geting account successful!\n\nPlease reboot the console\n\nYou are ready to go", TYPE_OK);
+
+	  return;
+	}
+}
+
 //remove template
 void UI::optremtemplate() {
 	if(MessageBox("Remove Template", "Would you like to remove \nThe Custom template?", TYPE_YES_NO)) {
@@ -673,6 +701,7 @@ mainMenu.clear();
     mainMenu[0].subMenu.push_back(MenuOption("Update Toolkit", "", bind(&UI::optUpdateHB, this)));
 	
     mainMenu[1].subMenu.push_back(MenuOption("Get Keys ", "", bind(&UI::optgetkeys, this)));
+    mainMenu[1].subMenu.push_back(MenuOption("add linked account ", "", bind(&UI::optgetaccount, this)));
     mainMenu[1].subMenu.push_back(MenuOption(calunlock, "", bind(&UI::optlinear, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Toggle AutoRCM", "", bind(&UI::optAutoRCM, this)));
     mainMenu[1].subMenu.push_back(MenuOption("Theme Remover", "", bind(&UI::optremtemplate, this)));
