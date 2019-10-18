@@ -12,6 +12,8 @@ https://discord.gg/kscctYj
 
 * Update the StarDustCFWpack
 
+* Update HBG++
+
 * Toggle AutoRCM
 
 * Dump Cal0/Boot0/Boot1
@@ -22,7 +24,6 @@ https://discord.gg/kscctYj
 
 * Reboot / shutdown
 
-![alt text](StarDust-Toolkit.jpg)
 **Credits**
 
 devkitPro for the devkitA64 toolchain.
