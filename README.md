@@ -14,15 +14,15 @@ https://discord.gg/kscctYj
 
 * Update HBG++
 
-* Toggle AutoRCM
-
-* Dump Cal0/Boot0/Boot1
+* Download System Updates
 
 * Get prod.keys
 
+* Unlock Prodinfo for Write
+
 * ArgonNX autoboot
 
-* Reboot / shutdown
+* Reboot to payload
 
 **Credits**
 
