@@ -18,8 +18,7 @@ https://discord.gg/kscctYj
 * Download System Updates to sd
 * Reboot to payload
 
-**Credits**
-
+**Credits**<br>
 devkitPro for the devkitA64 toolchain.<br>
 Reisyukaku for the code base. - https://github.com/Reisyukaku/ReiNXToolkit<br>
 Retrogamer 74 for part of the code.<br>
